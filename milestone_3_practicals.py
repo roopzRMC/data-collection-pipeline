@@ -84,7 +84,7 @@ travolta_soup.title
 travolta_films = travolta_soup.find('div', class_ = 'ipc-metadata-list-summary-item__tc')
 print(travolta_films)
 # %%
-trav_films = travolta_soup.find_all(text="ipc-metadata-list-summary-item__t")
+trav_films = travolta_soup.find_all(text="ipc-metadata-list-summary-item__t") 
 # %%
 print(trav_films)
 # %%
@@ -202,4 +202,81 @@ driver.get(next_button)
 big_list
 # %%
 dict_properties
+# %%
+#### Build a selenium class
+
+class lescraper:
+    def __init__(self, url):
+        self.url = url
+        self.driver = webdriver.Chrome()
+
+    def go_to_url(self):
+        self.driver.get(self.url)
+
+    def get_hotels_data(self):
+        hotel_dict = {'Hotel': [], 'Address': [], 'Price': [], 'AvgRating': []}
+        hotel_container = driver.find_element(by=By.XPATH, value='//div[@class="Itemstyled__Item-sc-12uga7p-0 ewNxOO PropertyCard__Section PropertyCard__Section--propertyInfo"]')
+        hotel_list = hotel_container.find_elements(by=By.XPATH, value='//h3[@class="PropertyCard__HotelName"]')
+        hotel_prices = hotel_container.find_elements(by=By.XPATH, value='//span[@class="PropertyCardPrice__Value"]')
+        hotel_addresses = hotel_container.find_elements(by=By.XPATH, value='//span[@class="Address__Text"]')
+        rating_container = driver.find_element(by=By.XPATH, value='//div[@class="Itemstyled__Item-sc-12uga7p-0 cNsNca PropertyCard__Section PropertyCard__Section--pricingInfo"]')
+        ratings = rating_container.find_elements(by=By.XPATH, value='//p[@class="Typographystyled__TypographyStyled-sc-j18mtu-0 Hkrzy kite-js-Typography "]')
+        for i in range(len(hotel_list)):
+            hotel_dict['Hotel'].append(hotel_list[i].text)
+            hotel_dict['Address'].append(hotel_addresses[i].text)
+            hotel_dict['Price'].append(hotel_prices[i].text)
+            hotel_dict['AvgRating'].append(ratings[i].text)
+        return hotel_dict
+
+
+    
+# %%
+agoda = lescraper(url='https://www.agoda.com/en-gb/search?city=9023&checkIn=2023-05-09&los=7&rooms=1&adults=2&children=1&childages=7&cid=1844104&locale=en-gb&ckuid=95581d02-61ef-4bd2-99e3-a16577324135&prid=0&currency=GBP&correlationId=4e535957-d2d0-468d-8f96-f6c17b4ae3e4&pageTypeId=1&realLanguageId=16&languageId=1&origin=GB&userId=95581d02-61ef-4bd2-99e3-a16577324135&whitelabelid=1&loginLvl=0&storefrontId=3&currencyId=2&currencyCode=GBP&htmlLanguage=en-gb&cultureInfoName=en-gb&machineName=am-pc-4g-acm-web-user-7cd56857bc-27dfk&trafficGroupId=1&sessionId=0rpc5l4grjcqf4nvz3snwdfc&trafficSubGroupId=84&aid=130589&useFullPageLogin=true&cttp=4&isRealUser=true&mode=production&browserFamily=Chrome&checkOut=2023-05-16&priceCur=GBP&textToSearch=Vancouver%20(BC)&travellerType=2&familyMode=off&productType=-1')
+# %%
+agoda.go_to_url()
+
+
+# %%
+dict = agoda.get_hotels_data()
+
+# %%
+dict
+# %%
+driver = webdriver.Chrome() 
+url = 'https://www.agoda.com/en-gb/search?city=9023&checkIn=2023-05-09&los=7&rooms=1&adults=2&children=1&childages=7&cid=1844104&locale=en-gb&ckuid=95581d02-61ef-4bd2-99e3-a16577324135&prid=0&currency=GBP&correlationId=4e535957-d2d0-468d-8f96-f6c17b4ae3e4&pageTypeId=1&realLanguageId=16&languageId=1&origin=GB&userId=95581d02-61ef-4bd2-99e3-a16577324135&whitelabelid=1&loginLvl=0&storefrontId=3&currencyId=2&currencyCode=GBP&htmlLanguage=en-gb&cultureInfoName=en-gb&machineName=am-pc-4g-acm-web-user-7cd56857bc-27dfk&trafficGroupId=1&sessionId=0rpc5l4grjcqf4nvz3snwdfc&trafficSubGroupId=84&aid=130589&useFullPageLogin=true&cttp=4&isRealUser=true&mode=production&browserFamily=Chrome&checkOut=2023-05-16&priceCur=GBP&textToSearch=Vancouver%20(BC)&productType=-1&travellerType=2&familyMode=off'
+
+driver.get(url)
+# %%
+## Get hotel container
+hotel_container = driver.find_element(by=By.XPATH, value='//div[@class="Itemstyled__Item-sc-12uga7p-0 ewNxOO PropertyCard__Section PropertyCard__Section--propertyInfo"]')
+# %%
+## Get hotel names
+hotel_list = hotel_container.find_elements(by=By.XPATH, value='//h3[@class="PropertyCard__HotelName"]')
+# %%
+hotel_list[1].text
+
+# %%
+## Get hotel prices
+
+hotel_prices = hotel_container.find_elements(by=By.XPATH, value='//span[@class="PropertyCardPrice__Value"]')
+# %%
+## Get hotel addresses
+hotel_addresses = hotel_container.find_elements(by=By.XPATH, value='//span[@class="Address__Text"]')
+# %%
+hotel_addresses[1].text
+# %%
+
+## Get avg rating container
+rating_container = driver.find_element(by=By.XPATH, value='//div[@class="Itemstyled__Item-sc-12uga7p-0 cNsNca PropertyCard__Section PropertyCard__Section--pricingInfo"]')
+# %%
+## get ratings
+ratings = rating_container.find_elements(by=By.XPATH, value='//p[@class="Typographystyled__TypographyStyled-sc-j18mtu-0 Hkrzy kite-js-Typography "]')
+# %%
+ratings[1].text
+# %%
+
+## get next button
+next_button = driver.find_element(by=By.XPATH, value='//button[@class="btn pagination2__next"]')
+# %%
+next_button.click()
 # %%
