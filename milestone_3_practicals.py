@@ -93,8 +93,13 @@ print(trav_films)
 # %%
 from selenium import webdriver 
 from selenium.webdriver.common.by import By
-driver = webdriver.Chrome()
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
 import time
+driver = webdriver.Chrome()
+# %%
 
 def load_and_accept_cookies() -> webdriver.Chrome:
     '''
@@ -213,6 +218,36 @@ class lescraper:
     def go_to_url(self):
         self.driver.get(self.url)
 
+    def sign_in(self, username, password):
+
+        ## select the signin option from the hamburger menu / hidden menu
+        hamburger = driver.find_element(by=By.XPATH, value='//div[@class="HiddenMenu__HideLargeShow-sc-2fn5tp-0 rkmhM"]')
+        hamburger.click()
+
+        time.sleep(2)
+        sign_in = driver.find_element(by=By.XPATH, value='//div[@data-selenium="user-menu-signin-button-container"]')
+        si_button = driver.find_element(by=By.XPATH, value='//button[@class="Buttonstyled__ButtonStyled-sc-5gjk6l-0 brUBl"]')
+        si_button.click()
+
+        ## enter a username
+        WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@title="Universal login"]')))
+        print("Frame Ready!")
+        driver.switch_to.frame(driver.find_element(by=By.XPATH, value='//*[@title="Universal login"]'))
+        email_input = driver.find_element(by=By.XPATH, value='//input[@id="email"]')
+        email_input.click()
+        email_input.send_keys(username)
+
+        ## enter a password
+        password_input = driver.find_element(by=By.XPATH, value='//input[@id="password"]')
+        password_input.click()
+        password_input.send_keys(password)
+
+        time.sleep(2)    
+        ## sign in with creds
+        sign_in_button = driver.find_element(by=By.XPATH, value='//button[@class="sc-fzoiQi hsJTpM"]')
+        sign_in_button.click()
+
+
     def get_hotels_data(self):
         hotel_dict = {'Hotel': [], 'Address': [], 'Price': [], 'AvgRating': []}
         hotel_container = driver.find_element(by=By.XPATH, value='//div[@class="Itemstyled__Item-sc-12uga7p-0 ewNxOO PropertyCard__Section PropertyCard__Section--propertyInfo"]')
@@ -246,6 +281,11 @@ driver = webdriver.Chrome()
 url = 'https://www.agoda.com/en-gb/search?city=9023&checkIn=2023-05-09&los=7&rooms=1&adults=2&children=1&childages=7&cid=1844104&locale=en-gb&ckuid=95581d02-61ef-4bd2-99e3-a16577324135&prid=0&currency=GBP&correlationId=4e535957-d2d0-468d-8f96-f6c17b4ae3e4&pageTypeId=1&realLanguageId=16&languageId=1&origin=GB&userId=95581d02-61ef-4bd2-99e3-a16577324135&whitelabelid=1&loginLvl=0&storefrontId=3&currencyId=2&currencyCode=GBP&htmlLanguage=en-gb&cultureInfoName=en-gb&machineName=am-pc-4g-acm-web-user-7cd56857bc-27dfk&trafficGroupId=1&sessionId=0rpc5l4grjcqf4nvz3snwdfc&trafficSubGroupId=84&aid=130589&useFullPageLogin=true&cttp=4&isRealUser=true&mode=production&browserFamily=Chrome&checkOut=2023-05-16&priceCur=GBP&textToSearch=Vancouver%20(BC)&productType=-1&travellerType=2&familyMode=off'
 
 driver.get(url)
+
+# %%
+## deal with cookies management
+
+
 # %%
 ## Get hotel container
 hotel_container = driver.find_element(by=By.XPATH, value='//div[@class="Itemstyled__Item-sc-12uga7p-0 ewNxOO PropertyCard__Section PropertyCard__Section--propertyInfo"]')
