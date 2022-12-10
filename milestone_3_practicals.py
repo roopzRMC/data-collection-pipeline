@@ -218,6 +218,13 @@ class lescraper:
     def go_to_url(self):
         self.driver.get(self.url)
 
+    def deny_the_cookies(self):
+        cookie_banner = driver.find_element(by=By.XPATH, value='//div[@class="ConsentBanner"]')
+
+        cookie_decline = cookie_banner.find_element(by=By.XPATH, value='//*[@class="BtnPair__RejectBtn"]')
+
+        cookie_decline.click()
+
     def sign_in(self, username, password):
 
         ## select the signin option from the hamburger menu / hidden menu
