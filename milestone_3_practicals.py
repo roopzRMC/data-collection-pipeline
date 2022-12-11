@@ -98,9 +98,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 import time
-driver = webdriver.Chrome()
-# %%
 
+# %%
+driver = webdriver.Chrome()
 def load_and_accept_cookies() -> webdriver.Chrome:
     '''
     Open Zoopla and accept the cookies
@@ -219,7 +219,7 @@ class lescraper:
         self.driver.get(self.url)
 
     def deny_the_cookies(self):
-        cookie_banner = driver.find_element(by=By.XPATH, value='//div[@class="ConsentBanner"]')
+        cookie_banner = self.driver.find_element(by=By.XPATH, value='//div[@class="ConsentBanner"]')
 
         cookie_decline = cookie_banner.find_element(by=By.XPATH, value='//*[@class="BtnPair__RejectBtn"]')
 
@@ -228,47 +228,72 @@ class lescraper:
     def sign_in(self, username, password):
 
         ## select the signin option from the hamburger menu / hidden menu
-        hamburger = driver.find_element(by=By.XPATH, value='//div[@class="HiddenMenu__HideLargeShow-sc-2fn5tp-0 rkmhM"]')
+        hamburger = self.driver.find_element(by=By.XPATH, value='//div[@class="HiddenMenu__HideLargeShow-sc-2fn5tp-0 rkmhM"]')
         hamburger.click()
 
         time.sleep(2)
-        sign_in = driver.find_element(by=By.XPATH, value='//div[@data-selenium="user-menu-signin-button-container"]')
-        si_button = driver.find_element(by=By.XPATH, value='//button[@class="Buttonstyled__ButtonStyled-sc-5gjk6l-0 brUBl"]')
+        sign_in = self.driver.find_element(by=By.XPATH, value='//div[@data-selenium="user-menu-signin-button-container"]')
+        si_button = self.driver.find_element(by=By.XPATH, value='//button[@class="Buttonstyled__ButtonStyled-sc-5gjk6l-0 brUBl"]')
         si_button.click()
 
         ## enter a username
-        WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@title="Universal login"]')))
+        delay = 2
+        WebDriverWait(self.driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@title="Universal login"]')))
         print("Frame Ready!")
-        driver.switch_to.frame(driver.find_element(by=By.XPATH, value='//*[@title="Universal login"]'))
-        email_input = driver.find_element(by=By.XPATH, value='//input[@id="email"]')
+        self.driver.switch_to.frame(self.driver.find_element(by=By.XPATH, value='//*[@title="Universal login"]'))
+        time.sleep(2)
+        email_input = self.driver.find_element(by=By.XPATH, value='//input[@id="email"]')
         email_input.click()
         email_input.send_keys(username)
 
         ## enter a password
-        password_input = driver.find_element(by=By.XPATH, value='//input[@id="password"]')
+        password_input = self.driver.find_element(by=By.XPATH, value='//input[@id="password"]')
         password_input.click()
         password_input.send_keys(password)
 
         time.sleep(2)    
         ## sign in with creds
-        sign_in_button = driver.find_element(by=By.XPATH, value='//button[@class="sc-fzoiQi hsJTpM"]')
+        sign_in_button = self.driver.find_element(by=By.XPATH, value='//button[@class="sc-fzoiQi hsJTpM"]')
         sign_in_button.click()
 
 
     def get_hotels_data(self):
         hotel_dict = {'Hotel': [], 'Address': [], 'Price': [], 'AvgRating': []}
-        hotel_container = driver.find_element(by=By.XPATH, value='//div[@class="Itemstyled__Item-sc-12uga7p-0 ewNxOO PropertyCard__Section PropertyCard__Section--propertyInfo"]')
-        hotel_list = hotel_container.find_elements(by=By.XPATH, value='//h3[@class="PropertyCard__HotelName"]')
-        hotel_prices = hotel_container.find_elements(by=By.XPATH, value='//span[@class="PropertyCardPrice__Value"]')
-        hotel_addresses = hotel_container.find_elements(by=By.XPATH, value='//span[@class="Address__Text"]')
-        rating_container = driver.find_element(by=By.XPATH, value='//div[@class="Itemstyled__Item-sc-12uga7p-0 cNsNca PropertyCard__Section PropertyCard__Section--pricingInfo"]')
-        ratings = rating_container.find_elements(by=By.XPATH, value='//p[@class="Typographystyled__TypographyStyled-sc-j18mtu-0 Hkrzy kite-js-Typography "]')
-        for i in range(len(hotel_list)):
-            hotel_dict['Hotel'].append(hotel_list[i].text)
-            hotel_dict['Address'].append(hotel_addresses[i].text)
-            hotel_dict['Price'].append(hotel_prices[i].text)
-            hotel_dict['AvgRating'].append(ratings[i].text)
+
+        ## agoda pages have infinite scroll
+
+        ## get initial scroll height
+
+        last_height = self.driver.execute_script("return document.body.scrollHeight")
+
+        ## 
+        while True:
+            self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            hotel_container = self.driver.find_element(by=By.XPATH, value='//div[@id="contentContainer"]')
+            hotel_list = hotel_container.find_elements(by=By.XPATH, value='//h3[@data-selenium="hotel-name"]')
+            hotel_prices = hotel_container.find_elements(by=By.XPATH, value='//span[@class="PropertyCardPrice__Value"]')
+            hotel_addresses = hotel_container.find_elements(by=By.XPATH, value='//span[@class="sc-dlfnbm sc-hKgILt eBEczI fdmzSj sc-pFZIQ gbgfMs"]')
+            rating_container = self.driver.find_element(by=By.XPATH, value='//div[@class="Box-sc-kv6pi1-0 ggePrW"]')
+            ratings = rating_container.find_elements(by=By.XPATH, value='//p[@class="Typographystyled__TypographyStyled-sc-j18mtu-0 Hkrzy kite-js-Typography "]')
+            for i in range(len(hotel_list)):
+                hotel_dict['Hotel'].append(hotel_list[i].text)
+                hotel_dict['Address'].append(hotel_addresses[i].text)
+                hotel_dict['Price'].append(hotel_prices[i].text)
+                hotel_dict['AvgRating'].append(ratings[i].text)
+
+
+            time.sleep(2)
+
+        ## calculate new scroll height and compare to old
+            new_height = self.driver.execute_script("return document.body.scrollHeight")
+            if new_height == last_height:
+                break
+            last_height = new_height
+
         return hotel_dict
+
+    def quit_scraping(self):
+        self.driver.quit()
 
 
     
@@ -277,6 +302,10 @@ agoda = lescraper(url='https://www.agoda.com/en-gb/search?city=9023&checkIn=2023
 # %%
 agoda.go_to_url()
 
+# %%
+agoda.deny_the_cookies()
+# %%
+agoda.sign_in(username="rupert.m.coghlan@gmail.com", password="newzeafra83!")
 
 # %%
 dict = agoda.get_hotels_data()
@@ -326,4 +355,8 @@ ratings[1].text
 next_button = driver.find_element(by=By.XPATH, value='//button[@class="btn pagination2__next"]')
 # %%
 next_button.click()
+# %%
+driver.quit()
+# %%
+agoda.quit_scraping()
 # %%
