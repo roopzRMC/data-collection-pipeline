@@ -216,6 +216,7 @@ class lescraper:
         self.url = url
         self.driver = webdriver.Chrome()
 
+
     def go_to_url(self):
         self.driver.get(self.url)
 
@@ -305,14 +306,116 @@ class lescraper:
 
     
 # %%
+
+## Testing the class
 agoda = lescraper(url='https://www.agoda.com/en-gb/search?city=9023&checkIn=2023-05-09&los=7&rooms=1&adults=2&children=1&childages=7&cid=1844104&locale=en-gb&ckuid=95581d02-61ef-4bd2-99e3-a16577324135&prid=0&currency=GBP&correlationId=4e535957-d2d0-468d-8f96-f6c17b4ae3e4&pageTypeId=1&realLanguageId=16&languageId=1&origin=GB&userId=95581d02-61ef-4bd2-99e3-a16577324135&whitelabelid=1&loginLvl=0&storefrontId=3&currencyId=2&currencyCode=GBP&htmlLanguage=en-gb&cultureInfoName=en-gb&machineName=am-pc-4g-acm-web-user-7cd56857bc-27dfk&trafficGroupId=1&sessionId=0rpc5l4grjcqf4nvz3snwdfc&trafficSubGroupId=84&aid=130589&useFullPageLogin=true&cttp=4&isRealUser=true&mode=production&browserFamily=Chrome&checkOut=2023-05-16&priceCur=GBP&textToSearch=Vancouver%20(BC)&travellerType=2&familyMode=off&productType=-1')
 # %%
 agoda.go_to_url()
 
 # %%
-agoda.deny_the_cookies()
 # %%
-agoda.sign_in(username="rupert.m.coghlan@gmail.com", password="newzeafra83!")
-
 # %%
 dict3 = agoda.get_hotels_data()
+
+## Re implementing the class 
+
+# %%
+class AgodaScraper:
+    def __init__(self, url):
+        self.url = url
+        self.driver = webdriver.Chrome()
+        self.go_to_url()
+        self.get_hotels_data()
+        self.quit_scraping()
+
+
+    def go_to_url(self):
+        self.driver.get(self.url)
+
+    def deny_the_cookies(self):
+        cookie_banner = self.driver.find_element(by=By.XPATH, value='//div[@class="ConsentBanner"]')
+
+        cookie_decline = cookie_banner.find_element(by=By.XPATH, value='//*[@class="BtnPair__RejectBtn"]')
+
+        cookie_decline.click()
+
+    def sign_in(self, username, password):
+
+        ## select the signin option from the hamburger menu / hidden menu
+        hamburger = self.driver.find_element(by=By.XPATH, value='//div[@class="HiddenMenu__HideLargeShow-sc-2fn5tp-0 rkmhM"]')
+        hamburger.click()
+
+        time.sleep(2)
+        sign_in = self.driver.find_element(by=By.XPATH, value='//div[@data-selenium="user-menu-signin-button-container"]')
+        si_button = self.driver.find_element(by=By.XPATH, value='//button[@class="Buttonstyled__ButtonStyled-sc-5gjk6l-0 brUBl"]')
+        si_button.click()
+
+        ## enter a username
+        delay = 2
+        WebDriverWait(self.driver, delay).until(EC.presence_of_element_located((By.XPATH, '//*[@title="Universal login"]')))
+        print("Frame Ready!")
+        self.driver.switch_to.frame(self.driver.find_element(by=By.XPATH, value='//*[@title="Universal login"]'))
+        time.sleep(2)
+        email_input = self.driver.find_element(by=By.XPATH, value='//input[@id="email"]')
+        email_input.click()
+        email_input.send_keys(username)
+
+        ## enter a password
+        password_input = self.driver.find_element(by=By.XPATH, value='//input[@id="password"]')
+        password_input.click()
+        password_input.send_keys(password)
+
+        time.sleep(2)    
+        ## sign in with creds
+        sign_in_button = self.driver.find_element(by=By.XPATH, value='//button[@class="sc-fzoiQi hsJTpM"]')
+        sign_in_button.click()
+
+
+    def get_hotels_data(self):
+        hotel_dict = {'Hotel': [], 'Address': [], 'Price': [], 'url' :[]}
+
+        ## agoda pages have infinite scroll
+
+        ## get initial scroll height
+
+        last_height = self.driver.execute_script("return document.body.scrollHeight")   
+
+        ## 
+        while True:
+            self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            hotel_container = self.driver.find_element(by=By.XPATH, value='//div[@id="contentContainer"]')
+            hotel_list = hotel_container.find_elements(by=By.XPATH, value='//h3[@data-selenium="hotel-name"]')
+            hotel_prices = hotel_container.find_elements(by=By.XPATH, value='//span[@class="PropertyCardPrice__Value"]')
+            hotel_addresses = hotel_container.find_elements(by=By.XPATH, value='//span[@class="sc-dlfnbm sc-hKgILt eBEczI fdmzSj sc-pFZIQ gbgfMs"]')
+            #rating_container = self.driver.find_element(by=By.XPATH, value='//div[@class="Box-sc-kv6pi1-0 ggePrW"]')
+            #ratings = rating_container.find_elements(by=By.XPATH, value='//p[@class="Typographystyled__TypographyStyled-sc-j18mtu-0 Hkrzy kite-js-Typography "]')
+            urls = self.driver.find_elements(by=By.XPATH, value='//a[@class="PropertyCard__Link"]')
+            for i in range(len(hotel_list)):
+                hotel_dict['Hotel'].append(hotel_list[i].text)
+                hotel_dict['Address'].append(hotel_addresses[i].text)
+                hotel_dict['Price'].append(hotel_prices[i].text)
+                #hotel_dict['AvgRating'].append(ratings[i].text)
+                hotel_dict['url'].append(urls[i].get_attribute('href'))
+
+
+            time.sleep(2)
+
+        ## calculate new scroll height and compare to old
+            new_height = self.driver.execute_script("return document.body.scrollHeight")
+            if new_height == last_height:
+                try:
+                    self.driver.find_element(by=By.XPATH, value='//button[@class="btn pagination2__next"]').click()
+                except NoSuchElementException:
+                    break
+            last_height = new_height
+            
+
+        return hotel_dict
+
+    def quit_scraping(self):
+        self.driver.quit()
+# %%
+url='https://www.agoda.com/en-gb/search?city=9023&checkIn=2023-05-09&los=7&rooms=1&adults=2&children=1&childages=7&cid=1844104&locale=en-gb&ckuid=95581d02-61ef-4bd2-99e3-a16577324135&prid=0&currency=GBP&correlationId=4e535957-d2d0-468d-8f96-f6c17b4ae3e4&pageTypeId=1&realLanguageId=16&languageId=1&origin=GB&userId=95581d02-61ef-4bd2-99e3-a16577324135&whitelabelid=1&loginLvl=0&storefrontId=3&currencyId=2&currencyCode=GBP&htmlLanguage=en-gb&cultureInfoName=en-gb&machineName=am-pc-4g-acm-web-user-7cd56857bc-27dfk&trafficGroupId=1&sessionId=0rpc5l4grjcqf4nvz3snwdfc&trafficSubGroupId=84&aid=130589&useFullPageLogin=true&cttp=4&isRealUser=true&mode=production&browserFamily=Chrome&checkOut=2023-05-16&priceCur=GBP&textToSearch=Vancouver%20(BC)&travellerType=2&familyMode=off&productType=-1'
+
+agoda_scraper = AgodaScraper(url)
+# %%
