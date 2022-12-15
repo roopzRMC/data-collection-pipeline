@@ -55,3 +55,50 @@ Locate the element which contains the field, use the click method and send keys 
         email_input.send_keys(username)
 
 ```
+
+## Scrolling
+If a page does not have infinite scroll the following code will scroll to the bottom of the page
+
+```
+driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+```
+Dealing with infinite scrolling requires a while loop as you do not as yet know how far down the page will reach
+
+```
+## get initial scroll height after first scroll
+
+last_height = driver.execute_script("return document.body.scrollHeight")   
+
+while True:
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    ## add scraping code here
+    ## get the current height as new_height:
+    new_height = driver.execute_script("return document.body.scrollHeight")
+
+    ## if after scrolling its the same as before - break
+    if new_height == last_height:
+    
+        ## this is where you can insert a try except to see if there is a next button to press
+        try:
+            self.driver.find_element(by=By.XPATH, value='//button[@class="btn pagination2__next"]').click()
+        except NoSuchElementException:
+            
+            break
+    ## otherwise set the last height as the last new_height and loop again
+    last_height = new_height
+```
+
+Note, you must make sure you import even the errors you wish to raise
+
+```
+from selenium import webdriver 
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import NoSuchElementException
+import time
+```
+
