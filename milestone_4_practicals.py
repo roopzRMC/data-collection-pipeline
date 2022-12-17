@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import NoSuchElementException
 import time
-
+from datetime import datetime
 
 ## Determine which elements to scrape from individual hotel page
 # %%
@@ -39,13 +39,17 @@ facilities = driver.find_elements(by=By.XPATH, value = '//div[@data-element-name
 # %%
 len(facilities)
 # %%
+print(str(datetime.now()))
 
+# %%
 ## Function for hotel details
 def get_hotel_data(url):
     driver = webdriver.Chrome()
     driver.get(url)
 
     time.sleep(4)
+
+    scrape_time = str(datetime.now())
 
     ## Get name
     hotel_name = driver.find_element(by=By.XPATH, value = '//h1[@class="HeaderCerebrum__Name"]')
@@ -70,7 +74,7 @@ def get_hotel_data(url):
         facilities_list.append(facilities[j].text)
 
 
-    hotel_dict = {'Hotel_Name': hotel_name.text, 'Images': image_links, 'Facilities' : facilities_list}
+    hotel_dict = {'Scrape Time': scrape_time, 'Hotel_Name': hotel_name.text, 'Images': image_links, 'Facilities' : facilities_list}
 
     return hotel_dict
 # %%
@@ -78,4 +82,48 @@ def get_hotel_data(url):
 myhotel = get_hotel_data(url)
 # %%
 myhotel
+# %%
+
+
+### 
+## Creating a file structure
+
+import os
+import json
+# %%
+os.getcwd()
+# %%
+path = 'raw_data'
+
+# %%
+try:
+    os.makedirs(path)
+except:
+    FileExistsError
+    print('directory already exists')
+
+# %%
+os.chdir(path)
+# %%
+os.getcwd()
+# %%
+
+## CHecks whether existing hotel exists within raw data and creates directory if not already there
+try:
+    os.makedirs(hotel_name.text)
+except:
+    FileExistsError
+    print('hotel directory already exists')
+os.chdir(hotel_name.text)
+# %%
+
+## DUmps the results of the dictionary to the sub directory
+with open(str(hotel_name.text+'.json'), 'w') as outfile:
+    json.dump(myhotel, outfile)
+outfile.close()
+
+# %%
+outfile.close()
+# %%
+str(hotel_name.text+'.json')
 # %%
