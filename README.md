@@ -102,3 +102,52 @@ from selenium.common.exceptions import NoSuchElementException
 import time
 ```
 
+> Getting Detailed Hotels data
+
+Leveraging the ``` import os ``` library and combining it with the hotel name allowed for a dynamic creation of a folder name
+
+Using ``` os.makedirs('raw_data') ``` created a folder to contain raw data. Within this ``` os.chdir('raw_data') ``` then ``` os.makedirs('hotel_name.text') ``` having already extracted the hotel name from the h1 class scraped via selenium
+
+### Getting Images
+
+Retrieving images requires importing the ``` urllib.request ``` module
+
+```
+## Find the images container
+   images_container = driver.find_element(by=By.XPATH, value='//div[@class="Box-sc-kv6pi1-0 kCNWwO Mosaic"]')
+## FIne the image elements 
+    images = images_container.find_elements(by=By.XPATH, value='//img[@class="SquareImage"]')
+
+## Instantiate an empty list object to extract the images too
+    image_links = []
+    for i in range(len(images)):
+        image_links.append(images[i].get_attribute('src'))
+
+```
+
+Using the OS library, a new directory (images) is created
+
+Using the ``` try except ``` approach allows us to detect whether this dir exists already, if not it does not try to overwrite and instead we change directories to enter this new dir 
+
+A new for loop is initiated to extract the urls via the urls in the image list
+
+```
+ for i in range(len(image_links)):
+        urllib.request.urlretrieve(image_links[i].split('?', 1)[0], str(str(datetime.now()) + '.jpg'))
+
+```
+Each image is saved with the current timestamp of extraction with the jpg file ext. It was necessary to split the url link before the ? to ensure the image was sourced correctly
+
+> Dumping the hotel details contents to a JSON
+
+Collecting the data from an individual hotel in a dictionary format means it can be easily resturctured to a JSON
+
+Use a context manager and the JSON library, we can dump the contents of the dictionary with the structure intact 
+
+```
+with open(str(hotel_name.text+'.json'), 'w') as outfile:
+    json.dump(myhotel, outfile)
+outfile.close()
+
+
+```
