@@ -1,4 +1,15 @@
-# %%
+'''
+This is a class to scrape hotel metadata from the agoda website
+
+Details retrieved are;
+    Hotel Name
+    Hotel description
+    Hotel facilities
+    Hotel thumbnail images
+
+The class creates a folder structure to store the metadata in a JSON dict and the images in an image folder
+
+'''
 from selenium import webdriver 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -11,7 +22,7 @@ from datetime import datetime
 import urllib.request
 import os
 import json
-# %%
+
 
 class AgodaDetailsScraper:
     def __init__(self, url):
@@ -22,7 +33,7 @@ class AgodaDetailsScraper:
         """
         Retrieves key individual hotel metadata
 
-        Takes the url supplied int he class instantiation.
+        Takes the url supplied in the class instantiation.
         It scrapes the hotel name, description, facilities.
         These elements are output to a dictionary.
         The dictionary is dumped to a json in a folder named after the hotel
