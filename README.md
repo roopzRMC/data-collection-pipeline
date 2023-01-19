@@ -151,3 +151,27 @@ outfile.close()
 
 
 ```
+> Unit Testing The Scraper
+
+### AgodaScraper (multiple hotels)
+
+There are 2 unit tests of this class
+
+```
+test_data_scraped()
+test_price_data_quality()
+```
+
+```test_data_scraped()``` tests that the dictionary that is eventually parsed as a JSON file is not empty by checking that the of sum of the dictionary's value lengths is greater than 1
+
+```test_price_quality_data()``` tests that the string values of the price values within the dictionary are actually numeric
+
+### AgodaDetailsScraper (hotel deepdive)
+
+There is 1 unit test of this class
+
+```
+test_hotel_facilities()
+```
+
+This tests that the facilities dictionary has a series of values greater than 2 to ensure that the relevant hotels have been scraped
