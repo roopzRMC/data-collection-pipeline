@@ -8,14 +8,11 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import NoSuchElementException
 import time
-options = Options()
-options.headless = True
-
 
 class AgodaScraper:
     def __init__(self, url):
         self.url = url
-        self.driver = webdriver.Chrome(options=options)
+        self.driver = webdriver.Remote('http://127.0.0.1:4444/wd/hub', webdriver.DesiredCapabilities.CHROME)
         self.go_to_url()
         self.vancouver_data = self.get_hotels_data()
         #self.quit_scraping()
