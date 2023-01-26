@@ -175,3 +175,12 @@ test_hotel_facilities()
 ```
 
 This tests that the facilities dictionary has a series of values greater than 2 to ensure that the relevant hotels have been scraped
+
+### Leveraging Docker Selenium Image
+
+port forwarding via ssh to a virtual machine should be in the form below
+
+```
+gcloud compute ssh --ssh-flag="-L 4444:localhost:4444" --zone "europe-west2-c" "docker-test"  --project "aicore-study"
+
+```
