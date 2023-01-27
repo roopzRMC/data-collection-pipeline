@@ -17,7 +17,7 @@ class AgodaScraper:
         self.url = url
         self.driver = webdriver.Chrome(options=options)
         self.go_to_url()
-        self.vancouver_data = self.get_hotels_data()
+        #self.vancouver_data = self.get_hotels_data()
         #self.quit_scraping()
 
 
@@ -78,7 +78,7 @@ class AgodaScraper:
             hotel_container = self.driver.find_element(by=By.XPATH, value='//div[@id="contentContainer"]')
             hotel_list = hotel_container.find_elements(by=By.XPATH, value='//h3[@data-selenium="hotel-name"]')
             hotel_prices = hotel_container.find_elements(by=By.XPATH, value='//span[@class="PropertyCardPrice__Value"]')
-            hotel_addresses = hotel_container.find_elements(by=By.XPATH, value='//span[@class="sc-dlfnbm sc-hKgILt eBEczI fdmzSj sc-pFZIQ gbgfMs"]')
+            hotel_addresses = hotel_container.find_elements(by=By.XPATH, value='//span[@class="sc-iBPRYJ sc-fubCfw dyNXNh hZNSEN sc-pFZIQ gbgfMs"]')
             #rating_container = self.driver.find_element(by=By.XPATH, value='//div[@class="Box-sc-kv6pi1-0 ggePrW"]')
             #ratings = rating_container.find_elements(by=By.XPATH, value='//p[@class="Typographystyled__TypographyStyled-sc-j18mtu-0 Hkrzy kite-js-Typography "]')
             urls = self.driver.find_elements(by=By.XPATH, value='//a[@class="PropertyCard__Link"]')
