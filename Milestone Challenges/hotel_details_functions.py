@@ -87,12 +87,10 @@ def get_hotel_metadata(url):
 
     print(f'dictionary creation complete, END OF LINE')
 
-    get_hotel_images()
-
 
 
 # %%
-get_hotel_metadata(url)
+
         
 
 
