@@ -17,6 +17,9 @@ print(hotels)
 
 print(f'Hotel list scraping complete')
 
+
+# after testing initial scraper - run below
+'''
 print(f'Now testing hotel details scraper')
 
 hotel_url = 'https://www.agoda.com/en-gb/hyatt-regency-vancouver/hotel/vancouver-bc-ca.html?finalPriceView=2&isShowMobileAppPrice=false&cid=1844104&numberOfBedrooms=&familyMode=false&adults=2&children=1&rooms=1&maxRooms=0&checkIn=2023-05-9&isCalendarCallout=false&childAges=7&numberOfGuest=0&missingChildAges=false&travellerType=2&showReviewSubmissionEntry=false&currencyCode=GBP&isFreeOccSearch=false&isCityHaveAsq=false&los=7&searchrequestid=0108ffcb-730c-4120-b463-c79a9971fa73'
@@ -28,3 +31,4 @@ hotel_details = details_scraper.get_hotel_metadata()
 print(f'showing hotel details scraped')
 
 print(hotel_details)
+'''
