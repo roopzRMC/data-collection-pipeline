@@ -12,7 +12,7 @@ import time
 class AgodaScraper:
     def __init__(self, url):
         self.url = url
-        self.driver = webdriver.Remote('http://127.0.0.1:4444/wd/hub', webdriver.DesiredCapabilities.CHROME)
+        self.driver = webdriver.Remote('http://172.17.0.2:4444/wd/hub', webdriver.DesiredCapabilities.CHROME)
         self.go_to_url()
         #self.vancouver_data = self.get_hotels_data()
         #self.quit_scraping()
