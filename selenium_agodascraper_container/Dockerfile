@@ -9,4 +9,4 @@ RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
 
 COPY . .
 RUN pip install -r requirements.txt
-CMD ["python", "scraper/celebrity_scraper.py"]
+CMD ["python", "run_scrapers.py"]
