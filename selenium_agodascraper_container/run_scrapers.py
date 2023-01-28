@@ -1,6 +1,6 @@
 
-from selenium_agodascraper_container.AgodaDetailsScraper import AgodaDetailsScraper
-from selenium_agodascraper_container.AgodaScaper import AgodaScraper
+from agodascraper.AgodaDetailsScraper import AgodaDetailsScraper
+from agodascraper.AgodaScaper import AgodaScraper
 
 print(f'This is testing the hotel scraper for vancouver hotels')
 
