@@ -184,3 +184,75 @@ port forwarding via ssh to a virtual machine should be in the form below
 gcloud compute ssh --ssh-flag="-L 4444:localhost:4444" --zone "europe-west2-c" "docker-test"  --project "aicore-study"
 
 ```
+
+### Issues with ARM based macs and selenium docker images
+
+It was necessary for a VM to be spun up using x486 architecture as the selenium image does not cater for arm archiecture
+
+### Preparing Docker on an ubuntu Virtual Machine
+
+Docker Engine needs to be installed via these instructions https://docs.docker.com/engine/install/ubuntu/
+
+Once installed, ensure docker has the correct sudo permissions ``` sudo usermod -a -G docker $USER```
+
+### Pulling Selenium from Docker and Running
+
+To pull the chromedriver version of selenium type
+
+```
+docker pull selenium/standalone-chrome 
+
+```
+
+To ensure you are portforwarding correctly run the image as per 
+
+```
+
+docker run -d -p 4444:4444 --shm-size=2g selenium/standalone-chrome:latest
+```
+
+Assuming that you have ssh'd in to the virtual machine port forwarding to 4444 you can log in to the selenium server on the browser by going to localhost:4444. Ensure that you note down the ip address that the selenium server running on.
+
+This ip address with correct port must be hardcoded to the webdriver.remote method in the class in the scraper
+
+```
+class AgodaScraper:
+    def __init__(self, url):
+        self.url = url
+        self.driver = webdriver.Remote('http://172.17.0.2:4444/wd/hub', webdriver.DesiredCapabilities.CHROME)
+        self.go_to_url()
+        #self.vancouver_data = self.get_hotels_data()
+        #self.quit_scraping()
+
+
+```
+
+### Creating the scraper dockerfile
+
+The dockerfile leverage python 3.10 and install the chrome driver on an ubuntu imaged machine
+
+The dockerfile references a requirements txt file which specifies the need for 
+
+* selenium
+* requests
+* webdriver-manager
+
+to be installed using pip
+
+The CMD statement runs the run_scrapers.py which trigger the scraper python files
+
+
+## CI/CD Pipeline
+
+The CI/CD pipelines consists of a github action located in ```.github/workflows``` directory and is found in the ```push_to_docker.yaml``` file
+
+The github action is configured to run on a push to the main branch only
+
+On pushing to main, the following actions are automated;
+
+* repo is checked out
+* docker is logged in to via the username and password secrets stored as github secrets
+* the docker image is republished to the private repository
+
+
+
